@@ -64,13 +64,14 @@ export default function App() {
         textAlign: "center",
         padding: "40px"
       }}>
-        {/* Montserrat font load */}
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+        <style jsx global>{`
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+        `}</style>
 
         <h1 style={{
           fontSize: "70px",
           marginBottom: "30px",
-          textShadow: "0 0 30px #1e40af", /* dark blue glow */
+          textShadow: "0 0 30px #1e40af",
           letterSpacing: "3px",
           fontWeight: "700"
         }}>
@@ -182,6 +183,10 @@ export default function App() {
       fontFamily: "'Montserrat', sans-serif",
       padding: "20px"
     }}>
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap');
+      `}</style>
+
       <h1 style={{ textAlign: "center", fontSize: "48px", textShadow: "0 0 20px #1e40af" }}>
         Өрөө: {roomId.toUpperCase()}
       </h1>
