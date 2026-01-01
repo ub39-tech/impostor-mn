@@ -1,42 +1,54 @@
 const express = require("express");
 const http = require("http");
-const { Server } = require("socket.io");
+const socketIo = require("socket.io");
 const cors = require("cors");
 
 const app = express();
-app.use(cors());
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: "*" } });
+const io = socketIo(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
 
-const rooms = {};
+app.use(cors());
+
+let rooms = {};
 
 const topics = [
-  "Цайны газар",
-  "Сургууль",
-  "Автобус",
   "Наадам",
-  "Гэр",
-  "Дэлгүүр",
-  "Зоогийн газар",
-  "Төмөр зам",
-  "Зах",
-  "Оффис",
-  "Гэр бүлийн өдөр",
-  "Мал маллах"
+  "Монгол гэр",
+  "Морин уралдаан",
+  "Сур харваа",
+  "Бөх",
+  "Хуур",
+  "Монгол хувцас",
+  "Цагаан сар",
+  "Улаанбаатар",
+  "Хөдөө",
+  "Айраг",
+  "Хуушуур",
+  "Бууз",
+  "Монгол дуу",
+  "Түүх",
+  "Чингис хаан",
+  "Өвөл",
+  "Зун",
+  "Говь",
+  "Хөвсгөл"
 ];
 
 io.on("connection", (socket) => {
-  console.log("Хэрэглэгч холбогдлоо:", socket.id);
+  console.log("Тоглогч холбогдлоо:", socket.id);
 
   socket.on("createRoom", ({ name }) => {
     const roomId = Math.random().toString(36).substring(2, 6).toUpperCase();
     rooms[roomId] = {
-      players: [{ id: socket.id, name, vote: null }],
+      players: [{ id: socket.id, name }],
       phase: "lobby",
-      topic: "",
-      impostorId: "",
-      discussionTimer: null,
-      votingTimer: null
+      discussionEndTime: null,
+      votingEndTime: null
     };
     socket.join(roomId);
     socket.emit("roomCreated", { roomId });
@@ -44,88 +56,108 @@ io.on("connection", (socket) => {
   });
 
   socket.on("joinRoom", ({ roomId, name }) => {
-    if (!rooms[roomId]) {
-      socket.emit("error", "Өрөө олдсонгүй");
-      return;
-    }
-    rooms[roomId].players.push({ id: socket.id, name, vote: null });
+    if (!rooms[roomId]) return socket.emit("error", "Өрөө олдсонгүй");
+    if (rooms[roomId].players.length >= 10) return socket.emit("error", "Өрөө дүүрсэн");
+    rooms[roomId].players.push({ id: socket.id, name });
     socket.join(roomId);
     io.to(roomId).emit("updateRoom", rooms[roomId]);
   });
 
   socket.on("startGame", ({ roomId }) => {
-    const room = rooms[roomId];
-    if (!room || room.players.length < 4 || room.phase !== "lobby") return;
-
+    if (!rooms[roomId] || rooms[roomId].players.length < 4) return;
+    const players = rooms[roomId].players;
+    const impostorIndex = Math.floor(Math.random() * players.length);
     const topic = topics[Math.floor(Math.random() * topics.length)];
-    const impostorIndex = Math.floor(Math.random() * room.players.length);
-    const impostorId = room.players[impostorIndex].id;
 
-    room.topic = topic;
-    room.impostorId = impostorId;
-    room.phase = "discussion";
-
-    room.players.forEach(player => {
-      if (player.id === impostorId) {
-        io.to(player.id).emit("yourRole", { role: "impostor", message: "Чи импостер! Сэдвийг мэдэхгүй дүр эсгэ." });
-      } else {
-        io.to(player.id).emit("yourRole", { role: "normal", message: `Сэдэв: ${topic}` });
-      }
+    players.forEach((p, i) => {
+      const role = i === impostorIndex ? "impostor" : "normal";
+      const message = role === "impostor" ? "Чи импостер! Сэдвийг мэдэхгүй дүр эсгэ." : `Сэдэв: ${topic}`;
+      io.to(p.id).emit("yourRole", { role, message });
     });
 
-    io.to(roomId).emit("updateRoom", room);
-    io.to(roomId).emit("phaseChange", "Ярилцах хугацаа эхэллээ (5 мин)");
+    rooms[roomId].phase = "discussion";
+    rooms[roomId].discussionEndTime = Date.now() + 5 * 60 * 1000; // 5 мин
+    rooms[roomId].votingEndTime = rooms[roomId].discussionEndTime + 1 * 60 * 1000; // 1 мин
 
-    room.discussionTimer = setTimeout(() => {
-      room.phase = "voting";
-      room.players.forEach(p => p.vote = null);
-      io.to(roomId).emit("updateRoom", room);
-      io.to(roomId).emit("phaseChange", "Санал өгөх хугацаа (1 мин)");
+    io.to(roomId).emit("updateRoom", rooms[roomId]);
+    io.to(roomId).emit("phaseChange", "Ярилцах үе шат эхэллээ (5 мин)");
 
-      room.votingTimer = setTimeout(() => endVoting(roomId), 60000);
-    }, 300000);
+    // Timer илгээх
+    const timerInterval = setInterval(() => {
+      const now = Date.now();
+      const timeLeft = rooms[roomId]?.phase === "discussion" ? rooms[roomId].discussionEndTime - now : rooms[roomId].votingEndTime - now;
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        if (rooms[roomId].phase === "discussion") {
+          rooms[roomId].phase = "voting";
+          io.to(roomId).emit("updateRoom", rooms[roomId]);
+          io.to(roomId).emit("phaseChange", "Санал өгөх үе шат эхэллээ (1 мин)");
+        }
+      } else {
+        io.to(roomId).emit("timerUpdate", { timeLeft });
+      }
+    }, 1000);
+
+    setTimeout(() => {
+      clearInterval(timerInterval);
+      if (rooms[roomId] && rooms[roomId].phase === "discussion") {
+        rooms[roomId].phase = "voting";
+        io.to(roomId).emit("updateRoom", rooms[roomId]);
+        io.to(roomId).emit("phaseChange", "Санал өгөх үе шат эхэллээ (1 мин)");
+      }
+    }, 5 * 60 * 1000);
+
+    setTimeout(() => {
+      if (rooms[roomId] && rooms[roomId].phase === "voting") {
+        endGame(roomId);
+      }
+    }, 6 * 60 * 1000);
   });
 
   socket.on("submitVote", ({ roomId, votedId }) => {
-    const room = rooms[roomId];
-    if (!room || room.phase !== "voting") return;
-    const player = room.players.find(p => p.id === socket.id);
-    if (player) player.vote = votedId;
-    io.to(roomId).emit("updateRoom", room);
+    if (!rooms[roomId]) return;
+    if (!rooms[roomId].votes) rooms[roomId].votes = {};
+    rooms[roomId].votes[socket.id] = votedId;
+    io.to(roomId).emit("updateRoom", rooms[roomId]);
+
+    if (Object.keys(rooms[roomId].votes).length === rooms[roomId].players.length) {
+      endGame(roomId);
+    }
   });
 
-  function endVoting(roomId) {
-    const room = rooms[roomId];
-    if (!room) return;
+  function endGame(roomId) {
+    if (!rooms[roomId]) return;
+    const votes = rooms[roomId].votes || {};
+    const voteCount = {};
+    Object.values(votes).forEach(v => voteCount[v] = (voteCount[v] || 0) + 1);
 
-    const voteCounts = {};
-    room.players.forEach(p => {
-      if (p.vote) voteCounts[p.vote] = (voteCounts[p.vote] || 0) + 1;
-    });
-    const maxVotes = Math.max(...Object.values(voteCounts), 0);
-    const votedOut = Object.keys(voteCounts).find(id => voteCounts[id] === maxVotes) || null;
-
-    let result = "";
-    if (votedOut === room.impostorId && votedOut) {
-      result = "Энгийн тоглогчид хожлоо! Импостер илэрлээ.";
-    } else {
-      result = "Импостер хожлоо!";
+    let maxVotes = 0;
+    let votedOut = null;
+    for (let playerId in voteCount) {
+      if (voteCount[playerId] > maxVotes) {
+        maxVotes = voteCount[playerId];
+        votedOut = playerId;
+      }
     }
 
-    io.to(roomId).emit("gameResult", { result, votedOut: votedOut || "Хэн ч биш", impostorId: room.impostorId });
+    const impostor = rooms[roomId].players.find(p => p.role === "impostor");
+    const result = votedOut === impostor?.id ? "Энгийн тоглогчид хожлоо!" : "Импостер хожлоо!";
 
-    room.phase = "lobby";
-    room.topic = "";
-    room.impostorId = "";
-    room.players.forEach(p => p.vote = null);
-    clearTimeout(room.discussionTimer);
-    clearTimeout(room.votingTimer);
-    io.to(roomId).emit("updateRoom", room);
+    io.to(roomId).emit("gameResult", { result });
+    delete rooms[roomId];
   }
 
   socket.on("disconnect", () => {
-    console.log("Хэрэглэгч саллаа:", socket.id);
+    console.log("Тоглогч саллаа:", socket.id);
+    for (let roomId in rooms) {
+      rooms[roomId].players = rooms[roomId].players.filter(p => p.id !== socket.id);
+      if (rooms[roomId].players.length === 0) delete rooms[roomId];
+      else io.to(roomId).emit("updateRoom", rooms[roomId]);
+    }
   });
 });
 
-server.listen(3001, () => console.log("Сервер 3001 порт дээр ажиллаж байна"));
+const PORT = process.env.PORT || 3001;
+server.listen(PORT, () => {
+  console.log(`Сервер ${PORT} порт дээр ажиллаж байна`);
+});
