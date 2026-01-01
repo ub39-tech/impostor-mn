@@ -55,27 +55,89 @@ export default function App() {
 
   if (!room) {
     return (
-      <div style={{ padding: "40px", fontFamily: "sans-serif", maxWidth: "500px", margin: "0 auto", textAlign: "center" }}>
-        <h1 style={{ fontSize: "48px", marginBottom: "40px" }}>Импостер / Хэн нь?</h1>
+      <div style={{
+        minHeight: "100vh",
+        background: "linear-gradient(to bottom, #0f0c29, #302b63, #24243e)",
+        color: "white",
+        fontFamily: "'Segoe UI', sans-serif",
+        textAlign: "center",
+        padding: "40px"
+      }}>
+        <h1 style={{
+          fontSize: "60px",
+          marginBottom: "20px",
+          textShadow: "0 0 20px #ff00ff"
+        }}>
+          Импостер / Хэн нь?
+        </h1>
+        <p style={{ fontSize: "24px", marginBottom: "40px" }}>
+          Монгол party game – найзуудтайгаа тоглоорой!
+        </p>
         <input
-          placeholder="Нэрээ оруул"
+          placeholder="Нэрээ оруул (жишээ: Түмүр)"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={{ width: "100%", padding: "15px", fontSize: "18px", marginBottom: "20px" }}
+          style={{
+            width: "80%",
+            maxWidth: "400px",
+            padding: "20px",
+            fontSize: "22px",
+            borderRadius: "15px",
+            border: "none",
+            marginBottom: "30px"
+          }}
         />
-        <button onClick={createRoom} style={{ width: "100%", padding: "20px", background: "#4CAF50", color: "white", border: "none", fontSize: "20px", cursor: "pointer", marginBottom: "20px" }}>
+        <br />
+        <button onClick={createRoom} style={{
+          width: "80%",
+          maxWidth: "400px",
+          padding: "25px",
+          background: "#4CAF50",
+          color: "white",
+          border: "none",
+          borderRadius: "20px",
+          fontSize: "28px",
+          cursor: "pointer",
+          marginBottom: "30px",
+          boxShadow: "0 10px 20px rgba(0,0,0,0.3)"
+        }}>
           Өрөө үүсгэх
         </button>
+        <br />
         <input
           placeholder="Өрөөний код (жишээ: ABCD)"
           value={roomId}
           onChange={(e) => setRoomId(e.target.value)}
-          style={{ width: "100%", padding: "15px", fontSize: "18px", marginBottom: "10px" }}
+          style={{
+            width: "80%",
+            maxWidth: "400px",
+            padding: "20px",
+            fontSize: "22px",
+            borderRadius: "15px",
+            border: "none",
+            marginBottom: "20px"
+          }}
         />
-        <button onClick={joinRoom} style={{ width: "100%", padding: "20px", background: "#2196F3", color: "white", border: "none", fontSize: "20px", cursor: "pointer" }}>
+        <br />
+        <button onClick={joinRoom} style={{
+          width: "80%",
+          maxWidth: "400px",
+          padding: "25px",
+          background: "#2196F3",
+          color: "white",
+          border: "none",
+          borderRadius: "20px",
+          fontSize: "28px",
+          cursor: "pointer",
+          boxShadow: "0 10px 20px rgba(0,0,0,0.3)"
+        }}>
           Өрөөнд нэгдэх
         </button>
-        {roomId && <p style={{ marginTop: "20px", fontSize: "24px" }}>Код: <strong>{roomId.toUpperCase()}</strong></p>}
+        {roomId && (
+          <p style={{ marginTop: "40px", fontSize: "32px" }}>
+            Код: <strong style={{ color: "#ffff00" }}>{roomId.toUpperCase()}</strong>
+          </p>
+        )}
       </div>
     );
   }
@@ -83,15 +145,38 @@ export default function App() {
   const isHost = room.players[0]?.id === socket.id;
 
   return (
-    <div style={{ padding: "30px", fontFamily: "sans-serif" }}>
-      <h1 style={{ textAlign: "center" }}>Өрөө: {roomId.toUpperCase()}</h1>
-      <h3>Тоглогчид ({room.players.length}/10)</h3>
-      <ul style={{ listStyle: "none", padding: 0 }}>
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(to bottom, #0f0c29, #302b63, #24243e)",
+      color: "white",
+      fontFamily: "'Segoe UI', sans-serif",
+      padding: "20px"
+    }}>
+      <h1 style={{ textAlign: "center", fontSize: "48px", textShadow: "0 0 20px #ff00ff" }}>
+        Өрөө: {roomId.toUpperCase()}
+      </h1>
+      <h3 style={{ textAlign: "center" }}>Тоглогчид ({room.players.length}/10)</h3>
+      <ul style={{ listStyle: "none", padding: 0, maxWidth: "600px", margin: "0 auto" }}>
         {room.players.map((p) => (
-          <li key={p.id} style={{ padding: "15px", fontSize: "20px", background: "#f0f0f0", margin: "10px 0", borderRadius: "10px" }}>
+          <li key={p.id} style={{
+            padding: "20px",
+            fontSize: "26px",
+            background: "rgba(255,255,255,0.1)",
+            margin: "15px 0",
+            borderRadius: "20px",
+            boxShadow: "0 5px 15px rgba(0,0,0,0.3)"
+          }}>
             {p.name} {p.id === socket.id && "(Чи)"}
             {room.phase === "voting" && p.id !== socket.id && (
-              <button onClick={() => vote(p.id)} style={{ marginLeft: "20px", padding: "10px 20px", background: "#FF5722", color: "white", border: "none" }}>
+              <button onClick={() => vote(p.id)} style={{
+                marginLeft: "30px",
+                padding: "15px 30px",
+                background: "#FF5722",
+                color: "white",
+                border: "none",
+                borderRadius: "15px",
+                fontSize: "20px"
+              }}>
                 Санал өгөх
               </button>
             )}
@@ -100,20 +185,46 @@ export default function App() {
       </ul>
 
       {myRole && (
-        <div style={{ padding: "20px", background: myRole.role === "impostor" ? "#ffcccc" : "#ccffcc", borderRadius: "10px", margin: "30px 0", fontSize: "24px", textAlign: "center" }}>
+        <div style={{
+          padding: "30px",
+          background: myRole.role === "impostor" ? "#ff4444" : "#44ff44",
+          borderRadius: "20px",
+          margin: "40px auto",
+          maxWidth: "600px",
+          fontSize: "30px",
+          textAlign: "center",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+        }}>
           <strong>Таны үүрэг:</strong> {myRole.message}
         </div>
       )}
 
-      <p style={{ fontSize: "20px" }}><strong>Үе шат:</strong> {room.phase === "lobby" ? "Лобби (хүлээж байна)" : room.phase === "discussion" ? "Ярилцах (5 мин)" : "Санал өгөх (1 мин)"}</p>
+      <p style={{ fontSize: "28px", textAlign: "center" }}>
+        <strong>Үе шат:</strong> {room.phase === "lobby" ? "Лобби" : room.phase === "discussion" ? "Ярилцах (5 мин)" : "Санал өгөх (1 мин)"}
+      </p>
 
       {room.phase === "lobby" && isHost && room.players.length >= 4 && (
-        <button onClick={startGame} style={{ width: "100%", padding: "25px", background: "#FF5722", color: "white", border: "none", fontSize: "28px", cursor: "pointer" }}>
+        <button onClick={startGame} style={{
+          width: "80%",
+          maxWidth: "500px",
+          padding: "30px",
+          background: "#FF5722",
+          color: "white",
+          border: "none",
+          borderRadius: "30px",
+          fontSize: "36px",
+          cursor: "pointer",
+          display: "block",
+          margin: "50px auto",
+          boxShadow: "0 15px 30px rgba(0,0,0,0.4)"
+        }}>
           Тоглоом эхлүүлэх
         </button>
       )}
       {room.phase === "lobby" && room.players.length < 4 && (
-        <p style={{ color: "red", fontSize: "20px" }}>Хамгийн багадаа 4 тоглогч хэрэгтэй</p>
+        <p style={{ color: "#ff4444", fontSize: "28px", textAlign: "center" }}>
+          Хамгийн багадаа 4 тоглогч хэрэгтэй
+        </p>
       )}
     </div>
   );
