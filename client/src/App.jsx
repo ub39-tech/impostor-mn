@@ -147,12 +147,7 @@ export default function App() {
             </p>
             <p style={{ fontSize: "24px" }}>Утаснаасаа скан хийгээд нэгдээрэй:</p>
             <div style={{ background: "white", padding: "20px", borderRadius: "20px", display: "inline-block" }}>
-              <QRCode
-                value={`https://impostor-mn.vercel.app?room=${roomId.toUpperCase()}`}
-                size={256}
-                level="H"
-                includeMargin={true}
-              />
+              <QRCode value={"https://impostor-mn.vercel.app?room=" + roomId.toUpperCase()} size={256} level="H" includeMargin={true} />
             </div>
           </div>
         )}
@@ -178,7 +173,7 @@ export default function App() {
         <div style={{ textAlign: "center", marginBottom: "30px" }}>
           <p style={{ fontSize: "22px" }}>Утаснаасаа скан хийгээд нэгдээрэй:</p>
           <div style={{ background: "white", padding: "15px", borderRadius: "15px", display: "inline-block" }}>
-            <QRCode value={`https://impostor-mn.vercel.app?room=${roomId.toUpperCase()}`} size={200} level="H" />
+            <QRCode value={"https://impostor-mn.vercel.app?room=" + roomId.toUpperCase()} size={200} level="H" />
           </div>
         </div>
       )}
@@ -217,4 +212,43 @@ export default function App() {
           padding: "30px",
           background: myRole.role === "impostor" ? "#ff4444" : "#44ff44",
           borderRadius: "20px",
-          margin
+          margin: "40px auto",
+          maxWidth: "600px",
+          fontSize: "30px",
+          textAlign: "center",
+          boxShadow: "0 10px 30px rgba(0,0,0,0.5)"
+        }}>
+          <strong>Таны үүрэг:</strong> {myRole.message}
+        </div>
+      )}
+
+      <p style={{ fontSize: "28px", textAlign: "center" }}>
+        <strong>Үе шат:</strong> {room.phase === "lobby" ? "Лобби" : room.phase === "discussion" ? "Ярилцах (5 мин)" : "Санал өгөх (1 мин)"}
+      </p>
+
+      {room.phase === "lobby" && isHost && room.players.length >= 4 && (
+        <button onClick={startGame} style={{
+          width: "80%",
+          maxWidth: "500px",
+          padding: "30px",
+          background: "#FF5722",
+          color: "white",
+          border: "none",
+          borderRadius: "30px",
+          fontSize: "36px",
+          cursor: "pointer",
+          display: "block",
+          margin: "50px auto",
+          boxShadow: "0 15px 30px rgba(0,0,0,0.4)"
+        }}>
+          Тоглоом эхлүүлэх
+        </button>
+      )}
+      {room.phase === "lobby" && room.players.length < 4 && (
+        <p style={{ color: "#ff4444", fontSize: "28px", textAlign: "center" }}>
+          Хамгийн багадаа 4 тоглогч хэрэгтэй
+        </p>
+      )}
+    </div>
+  );
+}
