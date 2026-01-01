@@ -60,20 +60,31 @@ export default function App() {
         minHeight: "100vh",
         background: "linear-gradient(to bottom, #0f0c29, #302b63, #24243e)",
         color: "white",
-        fontFamily: "'Segoe UI', sans-serif",
+        fontFamily: "'Montserrat', sans-serif",
         textAlign: "center",
         padding: "40px"
       }}>
+        {/* Montserrat font load */}
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet" />
+
         <h1 style={{
-          fontSize: "60px",
-          marginBottom: "20px",
-          textShadow: "0 0 20px #ff00ff",
-          letterSpacing: "2px"
+          fontSize: "70px",
+          marginBottom: "30px",
+          textShadow: "0 0 30px #1e40af", /* dark blue glow */
+          letterSpacing: "3px",
+          fontWeight: "700"
         }}>
-          Импостер / Хэн нь?
+          Дүр эсгэгч хэн нь вэ?
         </h1>
-        <p style={{ fontSize: "24px", marginBottom: "40px" }}>
-          Монгол party game – найзуудтайгаа тоглоорой! 🇲🇳
+
+        <p style={{
+          fontSize: "28px",
+          marginBottom: "50px",
+          lineHeight: "1.6",
+          fontWeight: "500"
+        }}>
+          Үдэшлэгийн тоглоом - Найзуудтайгаа цагийг сайхан өнгөрөөгөөрэй<br />
+          Дор хаяж 4 тоглогчыг урьж эхлэнэ шүү
         </p>
 
         <input
@@ -87,7 +98,9 @@ export default function App() {
             fontSize: "22px",
             borderRadius: "15px",
             border: "none",
-            marginBottom: "30px"
+            marginBottom: "30px",
+            background: "rgba(255,255,255,0.1)",
+            color: "white"
           }}
         />
         <br />
@@ -103,7 +116,8 @@ export default function App() {
           fontSize: "28px",
           cursor: "pointer",
           marginBottom: "30px",
-          boxShadow: "0 10px 20px rgba(0,0,0,0.3)"
+          boxShadow: "0 10px 20px rgba(0,0,0,0.3)",
+          fontWeight: "700"
         }}>
           Өрөө үүсгэх
         </button>
@@ -120,7 +134,9 @@ export default function App() {
             fontSize: "22px",
             borderRadius: "15px",
             border: "none",
-            marginBottom: "20px"
+            marginBottom: "20px",
+            background: "rgba(255,255,255,0.1)",
+            color: "white"
           }}
         />
         <br />
@@ -135,7 +151,8 @@ export default function App() {
           borderRadius: "20px",
           fontSize: "28px",
           cursor: "pointer",
-          boxShadow: "0 10px 20px rgba(0,0,0,0.3)"
+          boxShadow: "0 10px 20px rgba(0,0,0,0.3)",
+          fontWeight: "700"
         }}>
           Өрөөнд нэгдэх
         </button>
@@ -162,10 +179,10 @@ export default function App() {
       minHeight: "100vh",
       background: "linear-gradient(to bottom, #0f0c29, #302b63, #24243e)",
       color: "white",
-      fontFamily: "'Segoe UI', sans-serif",
+      fontFamily: "'Montserrat', sans-serif",
       padding: "20px"
     }}>
-      <h1 style={{ textAlign: "center", fontSize: "48px", textShadow: "0 0 20px #ff00ff" }}>
+      <h1 style={{ textAlign: "center", fontSize: "48px", textShadow: "0 0 20px #1e40af" }}>
         Өрөө: {roomId.toUpperCase()}
       </h1>
 
