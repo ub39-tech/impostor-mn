@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import QRCode from "qrcode.react";  // QR code library
+import QRCode from "qrcode.react";
 
 const socket = io("https://impostor-backend-stg4.onrender.com");
 
@@ -148,4 +148,73 @@ export default function App() {
             <p style={{ fontSize: "24px" }}>Утаснаасаа скан хийгээд нэгдээрэй:</p>
             <div style={{ background: "white", padding: "20px", borderRadius: "20px", display: "inline-block" }}>
               <QRCode
-                value={`https://im
+                value={`https://impostor-mn.vercel.app?room=${roomId.toUpperCase()}`}
+                size={256}
+                level="H"
+                includeMargin={true}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  const isHost = room.players[0]?.id === socket.id;
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "linear-gradient(to bottom, #0f0c29, #302b63, #24243e)",
+      color: "white",
+      fontFamily: "'Segoe UI', sans-serif",
+      padding: "20px"
+    }}>
+      <h1 style={{ textAlign: "center", fontSize: "48px", textShadow: "0 0 20px #ff00ff" }}>
+        Өрөө: {roomId.toUpperCase()}
+      </h1>
+
+      {roomId && (
+        <div style={{ textAlign: "center", marginBottom: "30px" }}>
+          <p style={{ fontSize: "22px" }}>Утаснаасаа скан хийгээд нэгдээрэй:</p>
+          <div style={{ background: "white", padding: "15px", borderRadius: "15px", display: "inline-block" }}>
+            <QRCode value={`https://impostor-mn.vercel.app?room=${roomId.toUpperCase()}`} size={200} level="H" />
+          </div>
+        </div>
+      )}
+
+      <h3 style={{ textAlign: "center" }}>Тоглогчид ({room.players.length}/10)</h3>
+      <ul style={{ listStyle: "none", padding: 0, maxWidth: "600px", margin: "0 auto" }}>
+        {room.players.map((p) => (
+          <li key={p.id} style={{
+            padding: "20px",
+            fontSize: "26px",
+            background: "rgba(255,255,255,0.1)",
+            margin: "15px 0",
+            borderRadius: "20px",
+            boxShadow: "0 5px 15px rgba(0,0,0,0.3)"
+          }}>
+            {p.name} {p.id === socket.id && "(Чи)"}
+            {room.phase === "voting" && p.id !== socket.id && (
+              <button onClick={() => vote(p.id)} style={{
+                marginLeft: "30px",
+                padding: "15px 30px",
+                background: "#FF5722",
+                color: "white",
+                border: "none",
+                borderRadius: "15px",
+                fontSize: "20px"
+              }}>
+                Санал өгөх
+              </button>
+            )}
+          </li>
+        ))}
+      </ul>
+
+      {myRole && (
+        <div style={{
+          padding: "30px",
+          background: myRole.role === "impostor" ? "#ff4444" : "#44ff44",
+          borderRadius: "20px",
+          margin
