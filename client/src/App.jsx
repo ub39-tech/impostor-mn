@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import QRCode from "qrcode.react";
 
 const socket = io("https://impostor-backend-stg4.onrender.com");
 
@@ -160,13 +159,12 @@ export default function App() {
 
         {roomId && (
           <div style={{ marginTop: "50px" }}>
-            <p style={{ fontSize: "28px", marginBottom: "20px" }}>
+            <p style={{ fontSize: "32px", marginBottom: "20px" }}>
               Код: <strong style={{ color: "#ffff00" }}>{roomId.toUpperCase()}</strong>
             </p>
-            <p style={{ fontSize: "24px" }}>Утаснаасаа скан хийгээд нэгдээрэй:</p>
-            <div style={{ background: "white", padding: "20px", borderRadius: "20px", display: "inline-block" }}>
-              <QRCode value={"https://impostor-mn.vercel.app?room=" + roomId.toUpperCase()} size={256} level="H" includeMargin={true} />
-            </div>
+            <p style={{ fontSize: "24px" }}>
+              Найзууддаа кодыг хуулж илгээгээд нэгдүүлээрэй!
+            </p>
           </div>
         )}
       </div>
@@ -191,14 +189,9 @@ export default function App() {
         Өрөө: {roomId.toUpperCase()}
       </h1>
 
-      {roomId && (
-        <div style={{ textAlign: "center", marginBottom: "30px" }}>
-          <p style={{ fontSize: "22px" }}>Утаснаасаа скан хийгээд нэгдээрэй:</p>
-          <div style={{ background: "white", padding: "15px", borderRadius: "15px", display: "inline-block" }}>
-            <QRCode value={"https://impostor-mn.vercel.app?room=" + roomId.toUpperCase()} size={200} level="H" />
-          </div>
-        </div>
-      )}
+      <p style={{ fontSize: "32px", textAlign: "center", margin: "30px 0" }}>
+        Код: <strong style={{ color: "#ffff00" }}>{roomId.toUpperCase()}</strong>
+      </p>
 
       <h3 style={{ textAlign: "center" }}>Тоглогчид ({room.players.length}/10)</h3>
       <ul style={{ listStyle: "none", padding: 0, maxWidth: "600px", margin: "0 auto" }}>
