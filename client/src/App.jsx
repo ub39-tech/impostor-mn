@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:3001");
+const socket = io("https://impostor-backend-stg4.onrender.com");
 
 export default function App() {
   const [name, setName] = useState("");
