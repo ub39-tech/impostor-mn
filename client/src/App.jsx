@@ -83,7 +83,7 @@ export default function App() {
       <div
         style={{
           minHeight: "100vh",
-          background: "linear-gradient(to bottom, #0f0c29, #302b63, #24243e)",
+          background: "url('/background.png') center/cover no-repeat",
           color: "white",
           fontFamily: "'Montserrat', sans-serif",
           textAlign: "center",
@@ -207,7 +207,7 @@ export default function App() {
     <div
       style={{
         minHeight: "100vh",
-        background: "linear-gradient(to bottom, #0f0c29, #302b63, #24243e)",
+        background: "url('/background.png') center/cover no-repeat",
         color: "white",
         fontFamily: "'Montserrat', sans-serif",
         padding: "20px",
